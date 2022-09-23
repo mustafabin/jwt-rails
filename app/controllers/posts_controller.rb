@@ -15,14 +15,15 @@ class PostsController < ApplicationController
 
   # POST /posts
   def create
-    # @post = Post.new(post_params)
-
-    # if @post.save
-    #   render json: @post, status: :created, location: @post
-    # else
-    #   render json: @post.errors, status: :unprocessable_entity
-    # end
-    render json: request.headers["token"]
+    token = request.headers["token"]
+    user_id = decode_token(token)
+    if user_id
+      # create the post 
+      new_post = Post.create!(content: params[:content], user_id:user_id)
+      render json: new_post
+    else
+      render json: {error: "401 incorrect token"}, status: 401
+    end
   end
 
   # PATCH/PUT /posts/1
